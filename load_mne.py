@@ -24,10 +24,15 @@ def mne_load_data(data_dict):
                 raw = RawArray(data_dict[patient][session][task]['y'], info)
 
                 # Create events array
-                events_raw = data_dict[patient][session][task]['trig'].reshape(
-                    -1, 1)
-                events = np.array([[i, 0, int(events_raw[i])]
-                                for i in range(events_raw.shape[0])])
+                # events_raw = data_dict[patient][session][task]['trig'].reshape(
+                #     -1, 1)
+                # events = np.array([[i, 0, int(events_raw[i])]
+                #                 for i in range(events_raw.shape[0])])
+                triggers = data_dict[patient][session][task]['trig']
+                triggerd = np.zeros_like(triggers, dtype=int)
+                triggerd[1:] = ((triggers[1:]-triggers[:-1])!=0) * (triggers[1:]!=0)
+                triggerd[triggerd!=0] = triggers[triggerd!=0]
+                events = np.column_stack((np.argwhere(triggerd)[:,0], np.zeros(sum(triggerd!=0), dtype=int),triggerd[triggerd!=0]))
 
                 # divide the eeg into epochs, each epoch is 8 seconds long (trigger is at 2 seconds, at 3.5 seconds )
                 # One session was composed by 240 MI repetitions on both hands, divided in 3 runs of 80 trials each.
