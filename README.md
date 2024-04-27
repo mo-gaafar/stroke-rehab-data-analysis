@@ -16,4 +16,3 @@ https://github.com/unicorn-bi/SpringSchool2024
 
 ## Team Members
 
-HElooo hello
