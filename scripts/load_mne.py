@@ -11,8 +11,8 @@ def mne_load_data(data_dict):
     # for every patient, pre and post, train and test
     for patient in data_dict.keys():
         mne_data_dict[patient] = {
-            "pre": {},
-            "post": {},
+            "Pre": {},
+            "Post": {},
         }
         for session in data_dict[patient].keys():
             mne_data_dict[patient][session] = {
