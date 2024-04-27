@@ -29,3 +29,8 @@ def plot_pseudospectrogram(epochs: mne.Epochs):
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (sec)')
     plt.show()
+
+
+def playground(epochs: mne.Epochs):
+    
+    pass

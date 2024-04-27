@@ -7,14 +7,23 @@ import mne
 def mne_load_data(data_dict):
     # Load into MNE format
 
-    mne_data_dict = {
-
-    }
+    mne_data_dict = {}
     # for every patient, pre and post, train and test
     for patient in data_dict.keys():
+        mne_data_dict[patient] = {
+            "pre": {},
+            "post": {},
+        }
         for session in data_dict[patient].keys():
+            mne_data_dict[patient][session] = {
+                "Train": {},
+                "Test": {},
+            }
             for task in data_dict[patient][session].keys():
-
+                mne_data_dict[patient][session][task] = {
+                    "left": None,
+                    "right": None,
+                }
                 eeg = data_dict[patient][session][task]['y'].T
                 sfreq = data_dict[patient][session][task]['fs'].squeeze(
                 ).item()
@@ -28,17 +37,18 @@ def mne_load_data(data_dict):
 
                 # Create info object
                 channel_map = {
-                    1: "FC3", 2: "FCz", 3:"FC4",
-                    4:"C5", 5:"C3", 6:"C1", 7:"Cz", 8:"C2", 9:"C4", 10:"C6",
-                    11: "CP3", 12:"CP1", 13:"CPz", 14:"CP2", 15:"CP4",
-                    16:"Pz",
+                    1: "FC3", 2: "FCz", 3: "FC4",
+                    4: "C5", 5: "C3", 6: "C1", 7: "Cz", 8: "C2", 9: "C4", 10: "C6",
+                    11: "CP3", 12: "CP1", 13: "CPz", 14: "CP2", 15: "CP4",
+                    16: "Pz",
                 }
                 info = create_info(ch_names=[channel_map[i+1] for i in range(eeg.shape[0])],
                                    sfreq=sfreq, ch_types=['eeg']*eeg.shape[0])
 
                 # Create RawArray object
                 raw = RawArray(eeg, info)
-                raw.set_montage(mne.channels.make_standard_montage('standard_1020'))
+                raw.set_montage(
+                    mne.channels.make_standard_montage('standard_1020'))
 
                 # Create events array
                 # events_raw = data_dict[patient][session][task]['trig'].reshape(
@@ -64,8 +74,9 @@ def mne_load_data(data_dict):
                 # Create epochs
                 print("Creating epochs...")
                 print(events.shape)
-                epochs = mne.Epochs(raw, events, tmin=0, tmax=8,
-                                    baseline=None, preload=True, event_id=event_dict)
+                # Note: zero of the epoch is the trigger time
+                epochs = mne.Epochs(raw, events, tmin=-0.5, tmax=6,
+                                    baseline=(-0.5, -0.2), preload=True, event_id=event_dict)
 
                 # Separate epochs for left and right hand MI
                 # left_epochs = epochs[data_dict[patient]
@@ -86,13 +97,9 @@ def mne_load_data(data_dict):
 
                 print("\n")
 
-                mne_data_dict[patient] = {
-                    session: {
-                        task: {
-                            "left": left_epochs,
-                            "right": right_epochs,
-                        }
-                    }
+                mne_data_dict[patient][session][task] = {
+                    "left": left_epochs,
+                    "right": right_epochs,
                 }
 
     return mne_data_dict
