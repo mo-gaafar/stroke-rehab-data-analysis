@@ -6,7 +6,6 @@ from scripts.load_project import load_project
 from config import *
 
 
-
 def init_cleaining():
     '''
     Initialize ICA cleaning logic
@@ -51,7 +50,9 @@ def init_cleaining():
 
 
 # TODO: to generalize on different subjects we can try using template matching
-def ica_cleaning_and_extraction(epoch, template_pkl_path=ICA_EXCLUDED):
+
+
+def ica_cleaning_and_extraction(epoch, template_pkl_path=ICA_EXCLUDED_PATH):
     '''
     epoch: mne.Epochs
     Returns: cleaned epoch, ica object
@@ -68,16 +69,11 @@ def ica_cleaning_and_extraction(epoch, template_pkl_path=ICA_EXCLUDED):
 
     ica = ICA(n_components=16, random_state=9)
 
-
     if template_matching:
         # We now supposedly have the ica.exclude template, we can match it with the current epoch
         # and exclude the same components using corrmap
         input_ica = ica.fit(epoch)
         corr = ica.compute_scores(epoch)
-        
-        
-
-
 
     ica.fit(epoch)
     epoch_clean = epoch.copy()
