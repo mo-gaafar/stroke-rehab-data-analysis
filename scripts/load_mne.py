@@ -75,7 +75,7 @@ def mne_load_data(data_dict):
                 print("Creating epochs...")
                 print(events.shape)
                 # Note: zero of the epoch is the trigger time
-                epochs = mne.Epochs(raw, events, tmin=-0.5, tmax=6,
+                epochs = mne.Epochs(raw, events, tmin=-0.5, tmax=4,#6,
                                     baseline=(-0.5, -0.2), preload=True, event_id=event_dict)
 
                 # Separate epochs for left and right hand MI
