@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pywt
 import numpy as np
 import mne
@@ -5,7 +6,7 @@ import mne
 
 def cwt(X):
     '''Compute the continuous wavelet transform of the input data.'''
-    
+
     # epochs, ch, t
     coefs, freqs = pywt.cwt(X, np.geomspace(
         1, 70, num=64), wavelet='morl')  # TODO : try morl or cmor1.5-1.0
@@ -15,22 +16,24 @@ def cwt(X):
     xtw = np.abs(xtw)
     return (xtw)
 
+
 def plot_pseudospectrogram(epochs: mne.Epochs):
     X = epochs.get_data()
-    xtw = cwt(X)
+    xwt = cwt(X)
 
-    axes = plt.subplot(111)
-    #
+    axes = plt.subplot(112)
     print(xwt.shape)
-    axes.pcolormesh(np.arange(xwt.shape[-1]), np.geomspace(1, 70, num=64), xwt[5,10], shading='nearest')
+    axes.pcolormesh(np.arange(
+        xwt.shape[-1]), np.geomspace(1, 70, num=64), xwt[5, 10], shading='nearest')
     # Set yscale, ylim and labels
     plt.yscale('log')
     plt.ylim([1, 70])
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (sec)')
     plt.show()
+    plt.close()
 
 
 def playground(epochs: mne.Epochs):
-    
+
     pass
