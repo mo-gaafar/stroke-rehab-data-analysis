@@ -17,8 +17,8 @@ class SilverBullet(torch.nn.Module):
         batch_size = shape[0]
         n_channels = shape[1]
         n_features = 5
-        n_hidden = 2*n_features
-        n_layers = 1
+        self.n_hidden = 4*2*n_features
+        self.n_layers = 1
         is_bidirectional = False
 
         self.spatial = torch.nn.Conv2d(1,n_features, (shape[1], 7))
@@ -31,10 +31,10 @@ class SilverBullet(torch.nn.Module):
 
         self.flat_regular = torch.nn.Flatten()
 
-        self.rnn = torch.nn.RNN(n_features, n_hidden, num_layers=n_layers, batch_first=True, dropout=0.1)
-        self.h0 = torch.randn((is_bidirectional*1+1)*n_layers, batch_size, n_hidden)
+        # self.rnn = torch.nn.RNN(n_features, self.n_hidden, num_layers=self.n_layers, batch_first=True, dropout=0.1)
+        # self.h0 = torch.randn((is_bidirectional*1+1)*self.n_layers, batch_size, self.n_hidden)
 
-        self.lstm = torch.nn.LSTM(n_features*8, n_hidden, num_layers=n_layers, batch_first=True, dropout=0.25)
+        self.lstm = torch.nn.LSTM(n_features*4, self.n_hidden, num_layers=self.n_layers, batch_first=True, dropout=0.25/self.n_layers)
         # self.h0 = 
 
         self.dropout = torch.nn.Dropout(0.7)
@@ -68,7 +68,12 @@ class SilverBullet(torch.nn.Module):
         #  self.h0[:,:X.shape[0],:]
         # X = self.rnn(X)
         # X = X[1].permute((1,0,2)).squeeze()
-        X = self.lstm(X)[0]#.permute((1,0,2)).squeeze()
+        # h0 = torch.randn(self.n_layers, X.shape[0],self.n_hidden)
+        # c0 = torch.randn(self.n_layers, X.shape[0],self.n_hidden)
+        # initial_state = (h0, c0)
+        initial_state = None
+        # print(X.shape)
+        X = self.lstm(X, initial_state)[0]#.permute((1,0,2)).squeeze()
         # print(X[0].shape)
         # X = X[0][:,]
         # # print(X.shape)
@@ -93,6 +98,7 @@ def _train_loop(dataloader, model, loss_fun, optimizer):
 
     for i, (inputs, labels) in enumerate(dataloader, 0):
         optimizer.zero_grad()
+        # print(inputs.shape)
         outputs = model(inputs)
         loss = loss_fun(outputs, labels)
         loss.backward()
@@ -147,12 +153,14 @@ def train_sb(X_train, y_train, X_test, y_test):
         y_train = torch.tensor(y_train, dtype=torch.long).to(device)
 
     m = SilverBullet(X_train.shape).to(device)
-    optimizer = torch.optim.Adam(m.parameters(), lr=5e-4)
+    gamma = 1/0.001
+    optimizer = torch.optim.Adam(m.parameters(), lr=5e-4/gamma)
     criterion = torch.nn.CrossEntropyLoss()
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30], gamma=gamma)
 
     n_epochs = 100
 
-    trainloader = torch.utils.data.DataLoader(list(zip(X_test,y_test)), batch_size=5)
+    trainloader = torch.utils.data.DataLoader(list(zip(X_train,y_train)), batch_size=5)
     testloader = torch.utils.data.DataLoader(list(zip(X_test,y_test)), batch_size=100, shuffle=True)
 
     train_loss, train_accuracy = _train_loop(trainloader, m, criterion, optimizer)
@@ -167,6 +175,7 @@ def train_sb(X_train, y_train, X_test, y_test):
         num_batches = len(trainloader)
         train_loss, train_accuracy = _train_loop(trainloader, m, criterion,optimizer)
         test_loss, test_accuracy = _test_loop(testloader, m, criterion)
+        scheduler.step()
 
         
         train_losses.append(train_loss)
