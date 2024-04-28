@@ -5,7 +5,7 @@ from mne import create_info
 import mne
 
 
-def load_project():
+def load_project(enable_preprocessing=False):
     # Load the data
     data_dict = {
         "Patient_1": {
@@ -43,5 +43,10 @@ def load_project():
     # Load into MNE format
     from .load_mne import mne_load_data
     mne_data_dict = mne_load_data(data_dict)
+
+    # preprocess the data
+    if enable_preprocessing:
+        from .preprocess import preprocess_all
+        mne_data_dict = preprocess_all(mne_data_dict)
 
     return mne_data_dict

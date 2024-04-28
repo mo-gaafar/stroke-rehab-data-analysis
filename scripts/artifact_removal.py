@@ -1,5 +1,6 @@
 import mne
 
-def artifact_removal(epoch: mne.Epochs):
 
+def remove_artifacts(epoch: mne.Epochs):
+    
     return epoch

@@ -1,0 +1,11 @@
+# ALL CONFIGURATION CONSTANTS ARE HERE import them in the modules
+
+
+PREPROCESSING = True
+ICA_CLEANING = True
+FEATURE_EXTRACTION = True
+CLASSIFICATION = True
+VISUALIZATION = True
+
+DATA_LOADING_DIR = "data/stroke"
+ICA_EXCLUDED_PATH = "data/ica_excluded.pkl"
