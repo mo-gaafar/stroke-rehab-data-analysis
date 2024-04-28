@@ -21,6 +21,10 @@ np.min(argwhere(triggers!=0))
 eeg_trig[1:] = (eeg_trig[1:]-eeg_trigs[:1])!=0 * (eeg_trigs[:1]==0)
 
 
-00011 1 0  0 -1-1-1 0
-00111 0 0 -1 -1-1 0 0
-00100-1 0 -1  0 0 1 0
+# 00011 1 0  0 -1-1-1 0
+# 00111 0 0 -1 -1-1 0 0
+# 00100-1 0 -1  0 0 1 0
+
+#%%
+import matplotlib.pyplot as plt
+plt.plot(np.random([1000]))
