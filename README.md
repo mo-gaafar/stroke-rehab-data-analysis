@@ -10,9 +10,7 @@
 4. Activate the virtual environment using `source .venv/bin/activate` or `.venv\Scripts\activate` on Windows
 5. Copy the dataset to the `data` folder if it is not already there
 
-## Dataset Used
+## Dataset Download
 
-https://github.com/unicorn-bi/SpringSchool2024
-
-## Team Members
+https://drive.google.com/file/d/1ZWjoMGYjDTQQ1K01tKPyAA57uN6dM7I2/view?usp=drive_link
 
